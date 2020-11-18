@@ -52,9 +52,6 @@ class BookmarkFragment : Fragment() {
         recyclerView.adapter = adapter
     }
 
-    private fun Any(any: Any): Any {
-
-    }
 
     private fun fetchBookmarkData() {
         topStoriesList.clear()
