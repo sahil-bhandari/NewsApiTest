@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Cocoon Test</string>
+    <string name="hello_blank_fragment">Blank fragment</string>
+    <string name="top_fragment">News</string>
+    <string name="bookmark_fragment">BookMark Fragment</string>
+    <string name="url">URL</string>
+</resources>
