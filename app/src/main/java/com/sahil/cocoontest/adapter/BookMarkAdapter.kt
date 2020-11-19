@@ -61,6 +61,7 @@ class BookMarkAdapter(mContext: Context, topStoriesList: List<NewsTable>,private
             Glide.with(mContext)
                 .load(newsTable.image)
                 .apply(requestOptions)
+                .placeholder(R.drawable.ic_baseline_broken_image_24)
                 .into(holder.imageView)
 
         } catch (ex: Exception) {

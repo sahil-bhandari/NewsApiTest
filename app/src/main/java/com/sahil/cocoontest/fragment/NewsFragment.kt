@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.sahil.cocoontest.BuildConfig
-import com.sahil.cocoontest.retrofit.MyRetrofitBuilder
+import com.sahil.cocoontest.retrofit.RetrofitAPISetup
 import com.sahil.cocoontest.R
 import com.sahil.cocoontest.adapter.NewsAdapter
 import com.sahil.cocoontest.models.network.Results
@@ -69,7 +69,7 @@ class NewsFragment : Fragment() {
 
     private fun getData() {
         // fetch data using retrofit
-        val apiService = MyRetrofitBuilder.API_INTERFACE
+        val apiService = RetrofitAPISetup.API_INTERFACE
         //coroutine lib used instead of async to avoid ANR error
         CoroutineScope(Dispatchers.IO).launch {
             resultsList.clear()

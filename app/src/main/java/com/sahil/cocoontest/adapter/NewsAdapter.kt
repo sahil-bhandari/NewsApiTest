@@ -3,7 +3,6 @@ package com.sahil.cocoontest.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,10 +17,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.sahil.cocoontest.R
 import com.sahil.cocoontest.WebViewActivity
-import com.sahil.cocoontest.room.AppDatabase
 import com.sahil.cocoontest.models.localdb.NewsTable
 import com.sahil.cocoontest.models.network.Results
-import com.sahil.cocoontest.utils.utility.covertTimeToText
+import com.sahil.cocoontest.room.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -58,12 +56,15 @@ class NewsAdapter(mContext: Context, resultsList: List<Results>) :
         holder.textViewDescription.text = result.abstract
         holder.imageBookmark.tag = R.drawable.ic_baseline_bookmark_border_24
         try {
+            //glide maintain cache limit
             val requestOptions: RequestOptions = RequestOptions().diskCacheStrategy(
                 DiskCacheStrategy.AUTOMATIC)
 
+            //glide to load images
             Glide.with(mContext)
                 .load(result.multimedia[0].url)
                 .apply(requestOptions)
+                .placeholder(R.drawable.ic_baseline_broken_image_24)
                 .into(holder.imageView)
         } catch (ex: Exception) {
         }
@@ -76,6 +77,7 @@ class NewsAdapter(mContext: Context, resultsList: List<Results>) :
         }
         holder.imageBookmark.setOnClickListener { view: View? ->
 
+            // check bookmarked entries
             if (holder.imageBookmark.tag == R.drawable.ic_baseline_bookmark_border_24){
                 val topStories = NewsTable(
                     title = result.title,
@@ -100,6 +102,7 @@ class NewsAdapter(mContext: Context, resultsList: List<Results>) :
 
     private fun saveData(topStoriesTable: NewsTable) {
 
+        //async add bookmark without blocking main thread
         GlobalScope.launch(Dispatchers.Main) { // Coroutine Dispatcher confined to Main UI Thread
             async {
                 val dao = AppDatabase.getInstance(mContext).topNewsDao()
