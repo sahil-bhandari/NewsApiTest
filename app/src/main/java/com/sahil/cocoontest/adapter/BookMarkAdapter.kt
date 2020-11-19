@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -19,13 +21,22 @@ import com.sahil.cocoontest.WebViewActivity
 import com.sahil.cocoontest.models.localdb.NewsTable
 import com.sahil.cocoontest.utils.utility.covertTimeToText
 
-class BookMarkAdapter(mContext: Context, topStoriesList: List<NewsTable>,val adapterOnClick : (Any) -> Unit) : RecyclerView.Adapter<BookMarkAdapter.Holder>() {
+class BookMarkAdapter(mContext: Context, topStoriesList: List<NewsTable>,private val listener: ItemClickListener) : RecyclerView.Adapter<BookMarkAdapter.Holder>() {
     private val mContext: Context = mContext
     private var topStoriesList = ArrayList<NewsTable>()
 
     init {
         this.topStoriesList = topStoriesList as ArrayList<NewsTable>
     }
+
+    companion object {
+        var mClickListener: ItemClickListener? = null
+    }
+
+    interface ItemClickListener {
+        fun clickToDelete(position: NewsTable)
+    }
+
 
     inner class Holder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.image)
@@ -40,14 +51,15 @@ class BookMarkAdapter(mContext: Context, topStoriesList: List<NewsTable>,val ada
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        val topStoriesTable: NewsTable = topStoriesList[position]
-        holder.textViewDate.text = "Added: ${covertTimeToText(topStoriesTable.publishDate)}"
-        holder.textViewTitle.text = topStoriesTable.title
+        val newsTable: NewsTable = topStoriesList[position]
+        mClickListener = listener
+        holder.textViewDate.text = "Added: ${covertTimeToText(newsTable.publishDate)}"
+        holder.textViewTitle.text = newsTable.title
         try {
             val requestOptions: RequestOptions = RequestOptions().diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
 
             Glide.with(mContext)
-                .load(topStoriesTable.image)
+                .load(newsTable.image)
                 .apply(requestOptions)
                 .into(holder.imageView)
 
@@ -57,16 +69,28 @@ class BookMarkAdapter(mContext: Context, topStoriesList: List<NewsTable>,val ada
 
         holder.cardView.setOnClickListener {
             val intent = Intent(mContext, WebViewActivity::class.java)
-            intent.putExtra(mContext.resources.getString(R.string.url), topStoriesTable.mainUrl)
+            intent.putExtra(mContext.resources.getString(R.string.url), newsTable.mainUrl)
             mContext.startActivity(intent)
         }
 
         holder.cardView.setOnLongClickListener {
-            showDialog(mContext)
+            showDialog(newsTable,mContext)
         }
     }
 
-    private fun showDialog(mContext: Context): Boolean {
+    private fun showDialog(position: NewsTable, mContext: Context): Boolean {
+        val alertDialog= AlertDialog.Builder(mContext)
+        alertDialog.setTitle("Delete!")
+            .setMessage("Are you Sure?")
+            .setPositiveButton(android.R.string.ok) { dialogInterface, i ->
+                try {
+                    mClickListener?.clickToDelete(position)
+                } catch (e: Exception) {
+                    Toast.makeText(mContext,"Unable to delete entry.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(android.R.string.cancel){dialogInterface, i ->null}
+            .show()
 
         return true
     }

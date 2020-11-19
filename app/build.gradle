@@ -21,6 +21,7 @@ android {
         buildConfigField "String", "BASEURL", '"https://api.nytimes.com/svc/topstories/v2/"' //url
         buildConfigField "String", "APIKEY", '"ebfaM954VIddZfKwFKwgPGad5ubjPBqK"' // apikey
         buildConfigField "String", "DB_NAME", '"News.db"'
+        buildConfigField "String", "TABLE_NAME", '"TopStories"'
     }
 
     buildTypes {

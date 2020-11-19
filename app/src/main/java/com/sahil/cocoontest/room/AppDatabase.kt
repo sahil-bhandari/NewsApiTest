@@ -9,7 +9,7 @@ import com.sahil.cocoontest.models.localdb.NewsTable
 
 @Database(entities = [NewsTable::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun topStoriesDao(): NewsDao
+    abstract fun topNewsDao(): NewsDao
 
     companion object {
 

@@ -4,8 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.sahil.cocoontest.BuildConfig
 
-@Entity(tableName = "TopStoriesTable", indices = [Index(value = ["title","image"], unique = true)])
+@Entity(tableName = BuildConfig.TABLE_NAME, indices = [Index(value = ["title","image"], unique = true)])
 class NewsTable(
     @ColumnInfo(name = "title") var title: String,
     @ColumnInfo(name = "description") var description: String,

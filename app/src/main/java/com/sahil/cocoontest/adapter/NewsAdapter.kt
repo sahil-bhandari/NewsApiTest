@@ -1,5 +1,6 @@
 package com.sahil.cocoontest.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
@@ -10,8 +11,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.sahil.cocoontest.R
 import com.sahil.cocoontest.WebViewActivity
 import com.sahil.cocoontest.room.AppDatabase
@@ -42,14 +46,20 @@ class NewsAdapter(mContext: Context, resultsList: List<Results>) :
         return Holder(LayoutInflater.from(mContext).inflate(R.layout.layout_top_stories, parent, false))
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val result: Results = resultsList[position]
-        holder.textViewDate.text = "published: " + covertTimeToText(result.published_date)
+        holder.textViewDate.text = result.published_date
         holder.textViewTitle.text = result.title
         holder.textViewDescription.text = result.abstract
+        holder.imageBookmark.tag = R.drawable.ic_baseline_bookmark_border_24
         try {
+            val requestOptions: RequestOptions = RequestOptions().diskCacheStrategy(
+                DiskCacheStrategy.AUTOMATIC)
+
             Glide.with(mContext)
                 .load(result.multimedia[0].url)
+                .apply(requestOptions)
                 .into(holder.imageView)
         } catch (ex: Exception) {
         }
@@ -62,14 +72,25 @@ class NewsAdapter(mContext: Context, resultsList: List<Results>) :
         }
         holder.imageBookmark.setOnClickListener { view: View? ->
 
-            val topStories = NewsTable(
-                title = result.title,
-                description = result.abstract,
-                publishDate = result.published_date,
-                image = result.multimedia.get(0).url,
-                mainUrl = result.url
-            )
-            saveData(topStories)
+            if (holder.imageBookmark.tag == R.drawable.ic_baseline_bookmark_border_24){
+                val topStories = NewsTable(
+                    title = result.title,
+                    description = result.abstract,
+                    publishDate = result.published_date,
+                    image = result.multimedia[0].url,
+                    mainUrl = result.url
+                )
+                saveData(topStories)
+                holder.imageBookmark.setImageDrawable(
+                    ContextCompat.getDrawable(
+                    mContext, // Context
+                    R.drawable.ic_baseline_bookmark_24 // Drawable
+                ))
+                holder.imageBookmark.tag = R.drawable.ic_baseline_bookmark_24
+            } else{
+                Toast.makeText(mContext,"Already bookmarked",Toast.LENGTH_SHORT).show()
+            }
+
         }
     }
 
@@ -77,7 +98,7 @@ class NewsAdapter(mContext: Context, resultsList: List<Results>) :
 
         class DataSave: AsyncTask<Void, Void, Void>(){
             override fun doInBackground(vararg p0: Void?): Void? {
-                val dao = AppDatabase.getInstance(mContext).topStoriesDao()
+                val dao = AppDatabase.getInstance(mContext).topNewsDao()
                 dao.insertData(topStoriesTable)
                 return null
             }
