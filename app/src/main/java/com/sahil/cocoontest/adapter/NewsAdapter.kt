@@ -22,6 +22,10 @@ import com.sahil.cocoontest.room.AppDatabase
 import com.sahil.cocoontest.models.localdb.NewsTable
 import com.sahil.cocoontest.models.network.Results
 import com.sahil.cocoontest.utils.utility.covertTimeToText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class NewsAdapter(mContext: Context, resultsList: List<Results>) :
     RecyclerView.Adapter<NewsAdapter.Holder>() {
@@ -96,20 +100,13 @@ class NewsAdapter(mContext: Context, resultsList: List<Results>) :
 
     private fun saveData(topStoriesTable: NewsTable) {
 
-        class DataSave: AsyncTask<Void, Void, Void>(){
-            override fun doInBackground(vararg p0: Void?): Void? {
+        GlobalScope.launch(Dispatchers.Main) { // Coroutine Dispatcher confined to Main UI Thread
+            async {
                 val dao = AppDatabase.getInstance(mContext).topNewsDao()
                 dao.insertData(topStoriesTable)
-                return null
             }
-
-            override fun onPostExecute(result: Void?) {
-                super.onPostExecute(result)
-                Toast.makeText(mContext , "News is bookmarked.", Toast.LENGTH_SHORT).show()
-            }
-
+            Toast.makeText(mContext , "News is bookmarked.", Toast.LENGTH_SHORT).show()
         }
-        DataSave().execute()
 
     }
 
